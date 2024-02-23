@@ -1,0 +1,21 @@
+build:
+  correctness:
+    test-sample-bootstrapper:
+      filter:
+        owner: vaticle
+        branch: [master, development]
+      image: vaticle-ubuntu-22.04
+      type: foreground
+      command: |
+        sudo apt-get update -y
+        sudo apt-get install -y docker
+        sudo service docker start
+        docker build  . -f docker/Dockerfile  --tag typedb-sample-data:test
+        docker run -p 1729:1729 -e BOOTSTRAPPER_VERBOSE=true -e BOOTSTRAPPER_CONFIG=/typedb-sample-data/__test/bootstrapper.yml -e BOOTSTRAPPER_DATASET_ROOT=/typedb-sample-data/__test --name typedb-sample-data-test-container typedb-sample-data:test &
+        sleep 30
+        docker exec typedb-sample-data-test-container typedb console --command="database list"  && export TEST_SUCCESS=0 || export TEST_SUCCESS=1 
+        docker stop typedb-sample-data-test-container; docker rm typedb-sample-data-test-container
+        exit $TEST_SUCCESS
+  execution:
+    - deploy-development
+    - deploy-production
