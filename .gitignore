@@ -1,0 +1,13 @@
+# python 
+**/*.pyc
+
+## misc
+.DS_Store
+dist/
+
+## bazel directories
+.ijwb
+.idea
+*.iml
+.vscode/settings.json
+.vscode/extensions.json
