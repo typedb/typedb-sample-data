@@ -81,8 +81,15 @@ def install_datasets(dataset_root, datasets):
         print("BOOTSTRAPPER_DATASET_ROOT detected. Datasets will be loaded from: ", DATASET_ROOT_OVERRIDE)
     else:
         print("Loading datasets from: ", dataset_root)
-
+    
+    output_to = None if VERBOSE else subprocess.DEVNULL
+    database_list_output = subprocess.check_output(["typedb", "console", "--core=127.0.0.1:%d"%BOOTSTRAPPER_PORT, "--command=database list"], stderr=output_to)
+    existing_databases = [(l.strip().decode("ascii")) for l in database_list_output.splitlines()[1:]]
+    
     for i, dataset in enumerate(datasets, start=1):
+        if dataset in existing_databases:
+            print("Skipping bootstrapping existing database: ",dataset)
+            continue
         print("%d/%d Loading %s"%(i, len(datasets), dataset))
         schema_file = "%s.schema.tql"%dataset
         data_file = "%s.data.tql"%dataset
