@@ -8,8 +8,8 @@ COPY docker/bootstrapper.py /typedb-sample-data
 CMD python3 -u bootstrapper.py && exec typedb server
 
 # The below copies are for testing. Uncomment if re-creating the master container.
-# COPY bootstrapper.yml /typedb-sample-data/__test/bootstrapper.yml
-# COPY datasets /typedb-sample-data/__test
+COPY bootstrapper.yml /typedb-sample-data/__test/bootstrapper.yml
+COPY datasets /typedb-sample-data/__test
 
 # To re-create the master container for version x.x.x:
 #   `docker build  . -f docker/Dockerfile  --tag typedb-sample-data:x.x.x`
