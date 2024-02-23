@@ -3,7 +3,7 @@ build:
     test-sample-bootstrapper:
       filter:
         owner: vaticle
-        branch: master
+        branch: [master, development]
       image: vaticle-ubuntu-22.04
       type: foreground
       command: |
