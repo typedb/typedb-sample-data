@@ -159,8 +159,6 @@ locating sub relation,
     relates located,
     relates location;
 
-indirect-locating sub locating;
-
 recommendation sub relation,
     relates recommended,
     relates recipient;
@@ -206,6 +204,37 @@ rule review-unverified:
         not { $review has verified true; };
     } then {
         $review has verified false;
+    };
+
+rule book-recommendation-by-genre:
+    when {
+        $user isa user;
+        $liked-book isa book;
+        {
+            ($user, $order) isa action-execution;
+            ($order, $liked-book) isa order-line;
+        } or {
+            ($user, $review) isa action-execution;
+            ($review, $liked-book) isa rating;
+            $review has score >= 7;
+        };
+        $new-book isa book;
+        not { {
+            ($user, $order) isa action-execution;
+            ($order, $new-book) isa order-line;
+        } or {
+            ($user, $review) isa action-execution;
+            ($review, $new-book) isa rating;
+        }; };
+        $liked-book has genre $shared-genre;
+        $new-book has genre $shared-genre;
+        not { {
+            $shared-genre == "fiction";
+        } or {
+            $shared-genre == "nonfiction";
+        }; };
+    } then {
+        (recommended: $new-book, recipient: $user) isa recommendation;
     };
 
 rule book-recommendation-by-author:
@@ -272,8 +301,8 @@ rule order-line-total-discounted-price:
 
 rule transitive-location:
     when {
-        (location: $parent-place, located: $child-place) isa! locating;
+        (location: $parent-place, located: $child-place) isa locating;
         (location: $child-place, located: $x) isa locating;
     } then {
-        (location: $parent-place, located: $x) isa indirect-locating;
+        (location: $parent-place, located: $x) isa locating;
     };

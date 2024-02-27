@@ -12,8 +12,15 @@ build:
         sudo service docker start
         docker build  . -f docker/Dockerfile  --tag typedb-sample-data:test
         docker run -p 1729:1729 -e BOOTSTRAPPER_VERBOSE=true -e BOOTSTRAPPER_CONFIG=/typedb-sample-data/__test/bootstrapper.yml -e BOOTSTRAPPER_DATASET_ROOT=/typedb-sample-data/__test --name typedb-sample-data-test-container typedb-sample-data:test &
-        sleep 30
-        docker exec typedb-sample-data-test-container typedb console --command="database list"  && export TEST_SUCCESS=0 || export TEST_SUCCESS=1 
+        for i in {1..20}; do
+          sleep 5
+          docker exec typedb-sample-data-test-container typedb console --command="database list"  && export TEST_SUCCESS=0 || export TEST_SUCCESS=1 
+          if [[ $TEST_SUCCESS -eq 0 ]]
+          then
+            echo "SUCCESS"
+            break
+          fi
+        done
         docker stop typedb-sample-data-test-container; docker rm typedb-sample-data-test-container
         exit $TEST_SUCCESS
   execution:
