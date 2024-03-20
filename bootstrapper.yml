@@ -1,7 +1,7 @@
 # Track version for breaking changes.
 bootstrapper-version: 1.0.0
 # TypeDB Version needed
-typedb-version: 2.26.6
+typedb-version: 2.27.0-rc0
 
 # Datasets to pre-install
 dataset-root: https://raw.githubusercontent.com/vaticle/typedb-sample-data/master/datasets/
