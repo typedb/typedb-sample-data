@@ -8,5 +8,5 @@ dataset-root: https://raw.githubusercontent.com/vaticle/typedb-sample-data/maste
 datasets:
   # The key will be used as database name. Schema & data file paths are relative to dataset-root
   bookstore:
-    schema: bookstore-schema.tql
-    data: bookstore-data.tql
+    schema: bookstore/schema.tql
+    data: bookstore/data.tql
