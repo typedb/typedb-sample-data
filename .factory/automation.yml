@@ -2,7 +2,7 @@ build:
   correctness:
     test-sample-bootstrapper:
       filter:
-        owner: vaticle
+        owner: typedb
         branch: [master, development]
       image: vaticle-ubuntu-22.04
       type: foreground
