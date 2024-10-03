@@ -17,5 +17,7 @@
 
 exports_files([
     "bookstore/data.tql",
-    "bookstore/schema.tql"
+    "bookstore/schema.tql",
+    "social-network/data.tql",
+    "social-network/schema.tql"
 ])

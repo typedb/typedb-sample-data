@@ -10,3 +10,6 @@ datasets:
   bookstore:
     schema: bookstore/schema.tql
     data: bookstore/data.tql
+  social-network:
+    schema: social-network/schema.tql
+    data: social-network/data.tql
