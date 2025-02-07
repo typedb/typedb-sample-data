@@ -1,11 +1,11 @@
 define
-  content sub entity, abstract,
+  entity content @abstract,
     owns id @key,
     owns is-visible,
     plays subscription:content;
 
-  page sub content, abstract,
-    owns page-id as id,
+  entity page @abstract, sub content,
+    owns page-id,
     owns name,
     owns bio,
     owns profile-picture,
@@ -15,8 +15,8 @@ define
     plays viewing:viewed,
     plays following:page;
 
-  profile sub page, abstract,
-    owns username as page-id,
+  entity profile @abstract, sub page,
+    owns username,
     owns can-publish,
     plays group-membership:member,
     plays location:located,
@@ -25,7 +25,7 @@ define
     plays following:follower,
     plays subscription:subscriber;
 
-  person sub profile,
+  entity person sub profile,
     owns gender,
     owns language,
     owns email,
@@ -45,77 +45,77 @@ define
     plays employment:employee,
     plays education:attendee;
 
-  birth sub relation,
+  relation birth,
     relates born,
     owns birth-date,
     plays location:located;
 
-  social-relation sub relation, abstract,
+  relation social-relation @abstract,
     relates related;
 
-  friendship sub social-relation,
+  relation friendship sub social-relation,
     relates friend as related;
 
-  family sub social-relation,
+  relation family sub social-relation,
     relates relative as related;
 
-  parentship sub family,
+  relation parentship sub family,
     relates parent as relative,
     relates child as relative;
 
-  siblingship sub family,
+  relation siblingship sub family,
     relates sibling as relative;
 
-  relationship sub social-relation,
+  relation relationship sub social-relation,
     relates partner as related,
     owns start-date;
 
-  engagement sub relationship,
+  relation engagement sub relationship,
     relates fiance as partner,
     owns engagement-date,
     plays location:located;
 
-  marriage sub relationship,
+  relation marriage sub relationship,
     relates spouse as partner,
     owns marriage-date,
     plays location:located;
 
-  organisation sub profile,
+  entity organisation sub profile,
     owns tag,
     plays employment:employer;
 
-  company sub organisation;
-  charity sub organisation;
+  entity company sub organisation;
+  entity charity sub organisation;
 
-  educational-institute sub organisation,
+  entity educational-institute sub organisation,
     plays education:institute;
 
-  school sub educational-institute;
-  college sub educational-institute;
-  university sub educational-institute;
+  entity school sub educational-institute;
+  entity college sub educational-institute;
+  entity university sub educational-institute;
 
-  employment sub relation,
+  relation employment,
     relates employer,
     relates employee,
     owns start-date,
     owns end-date,
     owns description;
 
-  education sub relation,
+  relation education,
     relates institute,
     relates attendee,
     owns start-date,
     owns end-date,
     owns description;
 
-  group sub page,
-    owns group-id as page-id,
+  entity group sub page,
+    owns group-id,
     owns tag,
     owns page-visibility,
     owns post-visibility,
     plays group-membership:group;
 
-  group-membership sub relation,
+  relation group-membership,
     relates group,
     relates member,
     owns rank,
@@ -123,8 +123,8 @@ define
     owns start-timestamp,
     owns end-timestamp;
 
-  post sub content, abstract,
-    owns post-id as id,
+  entity post @abstract, sub content,
+    owns post-id,
     owns post-text,
     owns creation-timestamp,
     owns language,
@@ -137,26 +137,26 @@ define
     plays location:located,
     plays viewing:viewed;
 
-  text-post sub post;
+  entity text-post sub post;
 
-  share-post sub post,
+  entity share-post sub post,
     plays sharing:share-post;
 
-  image-post sub post,
+  entity image-post sub post,
     owns post-image;
 
-  video-post sub post,
+  entity video-post sub post,
     owns post-video;
 
-  live-video-post sub video-post;
+  entity live-video-post sub video-post;
 
-  poll-post sub post,
+  entity poll-post sub post,
     owns question,
     owns answer,
     plays response:poll;
 
-  comment sub content,
-    owns comment-id as id,
+  entity comment sub content,
+    owns comment-id,
     owns comment-text,
     owns creation-timestamp,
     owns tag,
@@ -164,158 +164,158 @@ define
     plays commenting:parent,
     plays reaction:parent;
 
-  interaction sub relation, abstract,
+  relation interaction @abstract,
     relates subject,
     relates content;
 
-  viewing sub interaction,
+  relation viewing sub interaction,
     relates viewer as subject,
     relates viewed as content;
 
-  content-engagement sub interaction, abstract,
+  relation content-engagement @abstract, sub interaction,
     relates author as subject;
 
-  posting sub content-engagement,
+  relation posting sub content-engagement,
     relates page as content,
     relates post;
 
-  sharing sub content-engagement,
+  relation sharing sub content-engagement,
     relates original-post as content,
     relates share-post;
 
-  commenting sub content-engagement,
+  relation commenting sub content-engagement,
     relates parent as content,
     relates comment;
 
-  reaction sub content-engagement,
+  relation reaction sub content-engagement,
     relates parent as content,
     owns emoji,
     owns creation-timestamp;
 
-  response sub content-engagement,
+  relation response sub content-engagement,
     relates poll as content,
     owns answer,
     owns creation-timestamp;
 
-  following sub relation,
+  relation following,
     relates follower,
     relates page;
 
-  subscription sub relation,
+  relation subscription,
     relates subscriber,
     relates content;
 
-  place sub entity,
+  entity place,
     owns place-id,
     owns name,
     plays location:place;
 
-  region sub place,
+  entity region sub place,
     plays region-location:parent-region,
     plays region-location:child-region,
     plays country-location:region;
 
-  country sub place,
+  entity country sub place,
     owns language,
     plays country-location:country,
     plays state-location:country,
     plays city-location:parent,
     plays landmark-location:parent;
 
-  state sub place,
+  entity state sub place,
     plays state-location:state,
     plays city-location:parent,
     plays landmark-location:parent;
 
-  city sub place,
+  entity city sub place,
     plays city-location:city,
     plays landmark-location:parent;
 
-  landmark sub place,
+  entity landmark sub place,
     owns lattitude,
     owns longitude,
     plays landmark-location:landmark;
 
-  location sub relation,
+  relation location,
     relates place,
     relates located;
 
-  region-location sub location,
+  relation region-location sub location,
     relates parent-region as place,
     relates child-region as located;
 
-  country-location sub location,
+  relation country-location sub location,
     relates region as place,
     relates country as located;
 
-  state-location sub location,
+  relation state-location sub location,
     relates country as place,
     relates state as located;
 
-  city-location sub location,
+  relation city-location sub location,
     relates parent as place,
     relates city as located;
 
-  landmark-location sub location,
+  relation landmark-location sub location,
     relates parent as place,
     relates landmark as located;
 
-  id sub attribute, abstract, value string;
-  page-id sub id, abstract;
-  username sub page-id;
-  group-id sub page-id;
-  post-id sub id;
-  comment-id sub id;
-  place-id sub id;
+  attribute id @abstract, value string;
+  attribute page-id  @abstract, sub id;
+  attribute username sub page-id;
+  attribute group-id sub page-id;
+  attribute post-id sub id;
+  attribute comment-id sub id;
+  attribute place-id sub id;
 
-  name sub attribute, value string;
-  gender sub attribute, value string, regex "^(male|female|other)$";
-  language sub attribute, value string;
-  email sub attribute, value string;
-  phone sub attribute, value string;
-  relationship-status sub attribute, value string, regex "^(single|relationship|engaged|married|complicated)$";
-  lattitude sub attribute, value double;
-  longitude sub attribute, value double;
+  attribute name, value string;
+  attribute gender, value string @regex("^(male|female|other)$");
+  attribute language, value string;
+  attribute email, value string;
+  attribute phone, value string;
+  attribute relationship-status, value string @regex("^(single|relationship|engaged|married|complicated)$");
+  attribute lattitude, value double;
+  attribute longitude, value double;
 
-  event-date sub attribute, abstract, value datetime;
-  start-date sub event-date;
-  end-date sub event-date;
-  exact-date sub event-date, abstract;
-  birth-date sub exact-date;
-  engagement-date sub exact-date;
-  marriage-date sub exact-date;
+  attribute event-date @abstract, value datetime;
+  attribute start-date sub event-date;
+  attribute end-date sub event-date;
+  attribute exact-date @abstract, sub event-date;
+  attribute birth-date sub exact-date;
+  attribute engagement-date sub exact-date;
+  attribute marriage-date sub exact-date;
 
-  payload sub attribute, abstract, value string;
-  text-payload sub payload, abstract;
-  media-payload sub payload, abstract;
-  image-payload sub media-payload, abstract;
-  video-payload sub media-payload, abstract;
-  bio sub text-payload;
-  description sub text-payload;
-  profile-picture sub image-payload;
-  post-text sub text-payload;
-  post-image sub image-payload;
-  post-video sub video-payload;
-  question sub text-payload;
-  answer sub text-payload;
-  comment-text sub text-payload;
+  attribute payload @abstract, value string;
+  attribute text-payload @abstract, sub payload;
+  attribute media-payload @abstract, sub payload;
+  attribute image-payload @abstract, sub media-payload;
+  attribute video-payload @abstract, sub media-payload;
+  attribute bio sub text-payload;
+  attribute description sub text-payload;
+  attribute profile-picture sub image-payload;
+  attribute post-text sub text-payload;
+  attribute post-image sub image-payload;
+  attribute post-video sub video-payload;
+  attribute question sub text-payload;
+  attribute answer sub text-payload;
+  attribute comment-text sub text-payload;
 
-  tag sub attribute, value string;
-  rank sub attribute, value string, regex "^(member|moderator|admin|owner)$";
-  emoji sub attribute, value string, regex "^(like|love|funny|surprise|sad|angry)$";
-  badge sub attribute, value string;
+  attribute tag, value string;
+  attribute rank, value string @regex("^(member|moderator|admin|owner)$");
+  attribute emoji, value string @regex("^(like|love|funny|surprise|sad|angry)$");
+  attribute badge, value string;
 
-  creation-timestamp sub attribute, value datetime;
-  start-timestamp sub attribute, value datetime;
-  end-timestamp sub attribute, value datetime;
+  attribute creation-timestamp, value datetime;
+  attribute start-timestamp, value datetime;
+  attribute end-timestamp, value datetime;
 
-  visibility sub attribute, abstract, value string;
-  page-visibility sub visibility, regex "^(public|private)$";
-  post-visibility sub visibility, regex "^(default|public|private)$";
+  attribute visibility @abstract, value string;
+  attribute page-visibility sub visibility, value string @regex("^(public|private)$");
+  attribute post-visibility sub visibility, value string @regex("^(default|public|private)$");
 
-  is-visible sub attribute, value boolean;
-  is-active sub attribute, value boolean;
-  can-publish sub attribute, value boolean;
+  attribute is-visible, value boolean;
+  attribute is-active, value boolean;
+  attribute can-publish, value boolean;
 
 #  rule relatives-are-friends:
 #    when {
