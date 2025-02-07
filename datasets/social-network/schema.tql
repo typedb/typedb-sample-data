@@ -216,7 +216,7 @@ define
     plays country-location:region;
 
   entity country sub place,
-    owns language,
+    owns language @card(0..),
     plays country-location:country,
     plays state-location:country,
     plays city-location:parent,
