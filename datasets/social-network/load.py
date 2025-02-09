@@ -27,14 +27,16 @@ print("Schema committed")
 
 data = open(DATA_PATH)
 executed_lines = 0
-insert_results = 0
+total_inserted_rows = 0
 with driver.transaction(DATABASE, TransactionType.WRITE) as tx:
     for line in data:
         line = line.strip()
         if line and not line.startswith("#"):
-            insert_results += len([row for row in tx.query(line).resolve()])
+            inserted_rows = len([row for row in tx.query(line).resolve()])
+            total_inserted_rows += inserted_rows
             executed_lines += 1
+            assert inserted_rows == 1, "Inserted rows={} (expected 1) for query {}".format(inserted_rows, line)
     tx.commit()
-print("Data committed: {} lines/ {} rows returned".format(executed_lines, insert_results))
+print("Data committed: {} lines/ {} rows returned".format(executed_lines, total_inserted_rows))
 
 
