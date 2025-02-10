@@ -184,123 +184,122 @@ attribute end-timestamp, value datetime;
 attribute status, value string @regex("^(paid|dispatched|delivered|returned|canceled)$");
 attribute success, value boolean;
 
-# TODO: Krishnan: Port & Uncomment
-# rule review-verified-by-purchase:
-#     when {
-#         ($review, $product) isa rating;
-#         ($order, $product) isa order-line;
-#         ($user, $review) isa action-execution, has timestamp $review-time;
-#         ($user, $order) isa action-execution, has timestamp $order-time;
-#         $review-time > $order-time;
-#     } then {
-#         $review has verified true;
-#     };
+# TODO: Change to check
+fun is_review_verified_by_purchase($review: review) -> { order }:
+match
+    ($review, $product) isa rating;
+    ($order, $product) isa order-line;
+    ($user, $review) isa action-execution, has timestamp $review-time;
+    ($user, $order) isa action-execution, has timestamp $order-time;
+    $review-time > $order-time;
+return { $order };
 
-# rule review-unverified:
-#     when {
-#         $review isa review;
-#         not { $review has verified true; };
-#     } then {
-#         $review has verified false;
-#     };
+fun book_recommendations_for($user: user) -> {book}:
+match
+    $new-book isa book;
+    { 
+        let $new-book in book_recommendations_by_author($user); 
+    } or {
+        let $new-book in book_recommendations_by_genre($user); 
+    };
+    return { $new-book };
 
-# rule book-recommendation-by-genre:
-#     when {
-#         $user isa user;
-#         $liked-book isa book;
-#         {
-#             ($user, $order) isa action-execution;
-#             ($order, $liked-book) isa order-line;
-#         } or {
-#             ($user, $review) isa action-execution;
-#             ($review, $liked-book) isa rating;
-#             $review has score >= 7;
-#         };
-#         $new-book isa book;
-#         not { {
-#             ($user, $order) isa action-execution;
-#             ($order, $new-book) isa order-line;
-#         } or {
-#             ($user, $review) isa action-execution;
-#             ($review, $new-book) isa rating;
-#         }; };
-#         $liked-book has genre $shared-genre;
-#         $new-book has genre $shared-genre;
-#         not { {
-#             $shared-genre == "fiction";
-#         } or {
-#             $shared-genre == "nonfiction";
-#         }; };
-#     } then {
-#         (recommended: $new-book, recipient: $user) isa recommendation;
-#     };
+fun book_recommendations_by_genre($user: user) -> { book }:
+match
+    $user isa user;
+    $liked-book isa book;
+    {
+        ($user, $order-for-liked) isa action-execution;
+        ($order-for-liked, $liked-book) isa order-line;
+    } or {
+        ($user, $review-for-liked) isa action-execution;
+        ($review-for-liked, $liked-book) isa rating;
+        $review-for-liked has score >= 7;
+    };
+    $new-book isa book;
+    not { {
+        ($user, $order-for-new) isa action-execution;
+        ($order-for-new, $new-book) isa order-line;
+    } or {
+        ($user, $review-for-new) isa action-execution;
+        ($review-for-new, $new-book) isa rating;
+    }; };
+    $liked-book has genre $shared-genre;
+    $new-book has genre $shared-genre;
+    not { {
+        $shared-genre == "fiction";
+    } or {
+        $shared-genre == "nonfiction";
+    }; };
+return { $new-book };
 
-# rule book-recommendation-by-author:
-#     when {
-#         $user isa user;
-#         $liked-book isa book;
-#         {
-#             ($user, $order) isa action-execution;
-#             ($order, $liked-book) isa order-line;
-#         } or {
-#             ($user, $review) isa action-execution;
-#             ($review, $liked-book) isa rating;
-#             $review has score >= 7;
-#         };
-#         $new-book isa book;
-#         not { {
-#             ($user, $order) isa action-execution;
-#             ($order, $new-book) isa order-line;
-#         } or {
-#             ($user, $review) isa action-execution;
-#             ($review, $new-book) isa rating;
-#         }; };
-#         ($liked-book, $shared-author) isa authoring;
-#         ($new-book, $shared-author) isa authoring;
-#     } then {
-#         (recommended: $new-book, recipient: $user) isa recommendation;
-#     };
+fun book_recommendations_by_author($user: user) -> { book }:
+match
+    $user isa user;
+    $liked-book isa book;
+    {
+        ($user, $order-for-liked) isa action-execution;
+        ($order-for-liked, $liked-book) isa order-line;
+    } or {
+        ($user, $review-for-liked) isa action-execution;
+        ($review-for-liked, $liked-book) isa rating;
+        $review-for-liked has score >= 7;
+    };
+    $new-book isa book;
+    not { {
+        ($user, $order-for-new) isa action-execution;
+        ($order-for-new, $new-book) isa order-line;
+    } or {
+        ($user, $review-for-new) isa action-execution;
+        ($review-for-new, $new-book) isa rating;
+    }; };
+    ($liked-book, $shared-author) isa authoring;
+    ($new-book, $shared-author) isa authoring;
+return { $new-book };
 
-# rule order-line-total-retail-price:
-#     when {
-#         ($order) isa action-execution, has timestamp $order-time;
-#         $line ($order, $item) isa order-line;
-#         not {
-#             ($promotion, $item) isa promotion-inclusion;
-#             $promotion has start-timestamp <= $order-time,
-#                 has end-timestamp >= $order-time;
-#         };
-#         $item has price $retail-price;
-#         $line has quantity $quantity;
-#         ?line-total = $quantity * $retail-price;
-#     } then {
-#         $line has price ?line-total;
-#     };
 
-# rule order-line-total-discounted-price:
-#     when {
-#         ($order) isa action-execution, has timestamp $order-time;
-#         $line ($order, $item) isa order-line;
-#         ($best-promotion, $item) isa promotion-inclusion, has discount $best-discount;
-#         $best-promotion has start-timestamp <= $order-time,
-#             has end-timestamp >= $order-time;
-#         not {
-#             ($other-promotion, $item) isa promotion-inclusion, has discount > $best-discount;
-#             $other-promotion has start-timestamp <= $order-time,
-#                 has end-timestamp >= $order-time;
-#         };
-#         $item has price $retail-price;
-#         ?discounted-price = round(100 * $retail-price * (1 - $best-discount)) / 100;
-#         $line has quantity $quantity;
-#         ?line-total = $quantity * ?discounted-price;
-#     } then {
-#         $line has price ?line-total;
-#     };
+# TODO: Krishnan: Port to 3.x
+# # ---
+# # rule order-line-total-retail-price:
+# #     when {
+# #         ($order) isa action-execution, has timestamp $order-time;
+# #         $line ($order, $item) isa order-line;
+# #         not {
+# #             ($promotion, $item) isa promotion-inclusion;
+# #             $promotion has start-timestamp <= $order-time,
+# #                 has end-timestamp >= $order-time;
+# #         };
+# #         $item has price $retail-price;
+# #         $line has quantity $quantity;
+# #         ?line-total = $quantity * $retail-price;
+# #     } then {
+# #         $line has price ?line-total;
+# #     };
 
-# rule transitive-location:
-#     when {
-#         (location: $parent-place, located: $child-place) isa locating;
-#         (location: $child-place, located: $x) isa locating;
-#     } then {
-#         (location: $parent-place, located: $x) isa locating;
-#     };
+# # rule order-line-total-discounted-price:
+# #     when {
+# #         ($order) isa action-execution, has timestamp $order-time;
+# #         $line ($order, $item) isa order-line;
+# #         ($best-promotion, $item) isa promotion-inclusion, has discount $best-discount;
+# #         $best-promotion has start-timestamp <= $order-time,
+# #             has end-timestamp >= $order-time;
+# #         not {
+# #             ($other-promotion, $item) isa promotion-inclusion, has discount > $best-discount;
+# #             $other-promotion has start-timestamp <= $order-time,
+# #                 has end-timestamp >= $order-time;
+# #         };
+# #         $item has price $retail-price;
+# #         ?discounted-price = round(100 * $retail-price * (1 - $best-discount)) / 100;
+# #         $line has quantity $quantity;
+# #         ?line-total = $quantity * ?discounted-price;
+# #     } then {
+# #         $line has price ?line-total;
+# #     };
+
+# # rule transitive-location:
+# #     when {
+# #         (location: $parent-place, located: $child-place) isa locating;
+# #         (location: $child-place, located: $x) isa locating;
+# #     } then {
+# #         (location: $parent-place, located: $x) isa locating;
+# #     };
