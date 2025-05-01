@@ -11,7 +11,7 @@ SCHEMA_PATH = "schema.tql"
 DATA_PATH = "data.tql"
 
 credential = Credentials(USERNAME, PASSWORD)
-driver = TypeDB.core_driver(ADDRESS, credential, DriverOptions())
+driver = TypeDB.driver(ADDRESS, credential, DriverOptions())
 
 if driver.databases.contains(DATABASE):
     driver.databases.get(DATABASE).delete()
