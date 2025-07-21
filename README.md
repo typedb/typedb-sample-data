@@ -1,5 +1,7 @@
 # TypeDB Sample Data
 
+**Note: this repository was designed to support quick docker deploys of TypeDB + an included dataset. However, TypeDB will incorporate mechanisms for loading datasets directly, removing the need for a docker composition intermediary.**
+
 A collection of sample datasets for TypeDB. To start a TypeDB Core server with all sample datasets loaded, run the following commands:
 
 1. `docker image pull vaticle/typedb-sample-data:1.0.0`
